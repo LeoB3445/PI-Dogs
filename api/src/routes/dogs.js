@@ -61,4 +61,15 @@ dogs.get('/:id', function(req,res){
     result.then(found=> res.send(found));
 })
 
+dogs.post('/', function(req,res){
+    Dogs.create(req.body.dog)
+    .then((dog)=>{
+        Temperament.findAll({where:{
+            id:{[Op.in]:req.body.temperamentIds}
+        }})
+        .then((found)=>dog.setTemperaments(found));
+    })
+    .then(()=> res.status(201).send());
+})
+
 module.exports={dogs};
