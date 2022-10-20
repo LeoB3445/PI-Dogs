@@ -34,7 +34,31 @@ dogs.get('/', function(req,res){
 
     Promise.all([dbQuery,apiQuery])
     .then(  (data)=>res.send( {dbData:data[0], apiData:data[0]}    ) )
-    .catch((err)=> res.status(500).send(err))
+
+})
+
+dogs.get('/:id', function(req,res){
+    var result;
+    if(req.params.id[0] === 'd'){
+        let databaseId = parseInt(req.params.id.substring(1));
+        result = Dogs.findByPk(databaseId)
+        .then(dog=>
+            dog.getTemperaments()
+            .then((tempers)=>({
+                name:dog.name,
+                temperaments:tempers,
+                img:null,
+                weight:dog.weight,
+                height:dog.height,
+                life_expectancy:dog.life_expectancy
+                })
+            )
+        )
+    }else{
+        result = $.get(`https://api.thedogapi.com/v1/breeds`)
+        .then(data => data.find(elem=> elem.id===req.params.id))
+    }
+    result.then(found=> res.send(found));
 })
 
 module.exports={dogs};
