@@ -105,3 +105,19 @@ dist
 
 # package-lock.json
 package-lock.json
+client/build/asset-manifest.json
+client/build/favicon.ico
+client/build/index.html
+client/build/manifest.json
+client/build/robots.txt
+client/build/static/css/main.a617e044.chunk.css
+client/build/static/css/main.a617e044.chunk.css.map
+client/build/static/js/2.d60391bb.chunk.js
+client/build/static/js/2.d60391bb.chunk.js.LICENSE.txt
+client/build/static/js/2.d60391bb.chunk.js.map
+client/build/static/js/3.80509532.chunk.js
+client/build/static/js/3.80509532.chunk.js.map
+client/build/static/js/main.34f5ee91.chunk.js
+client/build/static/js/main.34f5ee91.chunk.js.map
+client/build/static/js/runtime-main.44f5ce6d.js
+client/build/static/js/runtime-main.44f5ce6d.js.map
