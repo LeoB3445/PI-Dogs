@@ -1,16 +1,37 @@
 const {Router}= require('express');
-const {fetch} = require('node-fetch')
+const https = require('https');
 const { Op } = require('sequelize');
-const {Dogs, Temperament} = require('../db');
+const {Dog, Temperament} = require('../db.js');
 
 const dogs = Router();
+
+const getPromise= function(url){
+    return new Promise(function(resolve,reject){
+        var req = https.get(url, function(res){
+            if(res.statusCode !== 200)  return reject(new Error('failed get-statusCode:'+res.statusCode));
+            var body = [];
+            res.on('data',(chunk)=> {body.push(chunk)})
+            res.on('end', ()=>{
+                try{
+                    JSON.parse(Buffer.concat(body).toString())
+                }catch(e){
+                    reject(e);
+                }
+                resolve(body);
+            })
+        });
+        req.on('error', function(err) {
+            reject(err);
+        });
+    });
+}
 
 dogs.get('/', function(req,res){
     var dbQuery, apiQuery;
     if(req.query.name){
-        apiQuery= fetch(`https://api.thedogapi.com/v1/breeds/search?q=${req.query.name}`);
+        apiQuery= getPromise(`https://api.thedogapi.com/v1/breeds/search?q=${req.query.name}`);
         console.log(apiQuery)
-        dbQuery= Dogs.findAll({
+        dbQuery= Dog.findAll({
             where:{
                 name:{
                     [Op.substring]:req.query.name
@@ -19,8 +40,8 @@ dogs.get('/', function(req,res){
         })
         
     }else{
-        apiQuery = fetch(`https://api.thedogapi.com/v1/breeds`)
-        dbQuery = Dogs.findAll()
+        apiQuery = getPromise(`https://api.thedogapi.com/v1/breeds`)
+        dbQuery = Dog.findAll()
     }
     dbQuery.then(data =>
         Promise.all(
@@ -41,7 +62,7 @@ dogs.get('/:id', function(req,res){
     var result;
     if(req.params.id[0] === 'd'){
         let databaseId = parseInt(req.params.id.substring(1));
-        result = Dogs.findByPk(databaseId)
+        result = Dog.findByPk(databaseId)
         .then(dog=>
             dog.getTemperaments()
             .then((tempers)=>({
@@ -55,14 +76,14 @@ dogs.get('/:id', function(req,res){
             )
         )
     }else{
-        result = $.get(`https://api.thedogapi.com/v1/breeds`)
+        result = getPromise(`https://api.thedogapi.com/v1/breeds`)
         .then(data => data.find(elem=> elem.id===req.params.id))
     }
     result.then(found=> res.send(found));
 })
 
 dogs.post('/', function(req,res){
-    Dogs.create(req.body.dog)
+    Dog.create(req.body.dog)
     .then((dog)=>{
         Temperament.findAll({where:{
             id:{[Op.in]:req.body.temperamentIds}
