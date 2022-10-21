@@ -1,5 +1,5 @@
 const {Router}= require('express');
-const {$} = require('jquery');
+const {fetch} = require('node-fetch')
 const { Op } = require('sequelize');
 const {Dogs, Temperament} = require('../db');
 
@@ -8,7 +8,7 @@ const dogs = Router();
 dogs.get('/', function(req,res){
     var dbQuery, apiQuery;
     if(req.query.name){
-        apiQuery= $.get(`https://api.thedogapi.com/v1/breeds/search?q=${req.query.name}`);
+        apiQuery= fetch(`https://api.thedogapi.com/v1/breeds/search?q=${req.query.name}`);
         console.log(apiQuery)
         dbQuery= Dogs.findAll({
             where:{
@@ -19,7 +19,7 @@ dogs.get('/', function(req,res){
         })
         
     }else{
-        apiQuery = $.get(`https://api.thedogapi.com/v1/breeds`)
+        apiQuery = fetch(`https://api.thedogapi.com/v1/breeds`)
         dbQuery = Dogs.findAll()
     }
     dbQuery.then(data =>
