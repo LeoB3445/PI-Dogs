@@ -1,7 +1,7 @@
 const { Dog, conn } = require('../../src/db.js');
 const { expect } = require('chai');
 
-describe('Dog model', () => {
+xdescribe('Dog model', () => {
   const dummy = {
     name:'doggo',
     height: 12,
