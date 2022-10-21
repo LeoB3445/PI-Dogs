@@ -22,7 +22,7 @@
     "morgan": "^1.10.0",
     "pg": "^8.5.1",
     "sequelize": "^6.3.5",
-    "jquery":"^3.6.1"
+    "node-fetch":"^3.2.10"
   },
   "devDependencies": {
     "supertest-session": "^4.1.0",
