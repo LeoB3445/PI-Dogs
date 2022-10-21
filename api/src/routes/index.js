@@ -7,7 +7,7 @@ const { landing } = require('./landing');
 
 const router = Router();
 
-router.use('dogs', dogs);
+router.use('/dogs', dogs);
 
 router.use('/', landing);
 // Configurar los routers
