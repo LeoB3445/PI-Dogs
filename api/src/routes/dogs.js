@@ -32,7 +32,7 @@ dogs.get('/', function(req,res){
             )
         )  
     );
-    apiQuery.then(data=> data.map(dog=> (   {name:dog.name, temperaments:dog.temperament, weight:dog.weight.metric, img:dog.image.url}  )))
+    apiQuery.then(data=> data.map(dog=> (   {name:dog.name, temperaments:dog.temperament, weight:dog.weight.metric, img:dog.image.id}  )))
 
     Promise.all([dbQuery,apiQuery])
     .then(  (data)=>res.send( {dbData:data[0], apiData:data[1]}    ) )
@@ -48,6 +48,7 @@ dogs.get('/:id', function(req,res){
             dog.getTemperaments()
             .then((tempers)=>({
                 name:dog.name,
+                id:('d' + dog.id),
                 temperaments:tempers,
                 img:null,
                 weight:dog.weight,
@@ -59,9 +60,18 @@ dogs.get('/:id', function(req,res){
     }else{
         
         result = getPromise(`https://api.thedogapi.com/v1/breeds`)
-        .then(data =>  data.find(elem=> (elem.id==req.params.id)   ));
+        .then(data =>  data.find(elem=> (elem.id==req.params.id)   ))
+        .then(dog=> ({
+            name:dog.name,
+            id:dog.id,
+            temperaments: dog.temperament,
+            img: dog.image.id,
+            weight: weight.metric,
+            height: height.metric,
+            life_expectancy: life_span
+        })    );
     }
-    result.then(found=> {console.log(found);res.send(found)});
+    result.then(found=> {res.send(found)});
 })
 
 dogs.post('/', function(req,res){
