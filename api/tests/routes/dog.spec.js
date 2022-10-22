@@ -5,11 +5,14 @@ const app = require('../../src/app.js');
 const { Dog, conn } = require('../../src/db.js');
 
 const agent = session(app);
-const dog = {
-  name: 'Pug',
-};
+const dummy = {
+  name:'doggo',
+  height: 12,
+  weight:27,
+  life_expectancy: 3
+}
 
-describe('Videogame routes', () => {
+describe('dog routes', () => {
   before(() => conn.authenticate()
   .catch((err) => {
     console.error('Unable to connect to the database:', err);
@@ -20,4 +23,9 @@ describe('Videogame routes', () => {
       agent.get('/dogs').expect(200)
     );
   });
+  describe('POST /dogs', ()=>{
+    it('should get 201 if given a valid dog', ()=>{
+      agent.post('/dogs', dummy).expect(201);
+    })
+  })
 });
