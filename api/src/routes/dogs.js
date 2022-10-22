@@ -2,35 +2,16 @@ const {Router}= require('express');
 const https = require('https');
 const { Op } = require('sequelize');
 const {Dog, Temperament} = require('../db.js');
+const {getPromise} = require('./apiCallers')
 
 const dogs = Router();
 
-const getPromise= function(url){
-    return new Promise(function(resolve,reject){
-        var req = https.get(url, function(res){
-            if(res.statusCode !== 200)  return reject(new Error('failed get-statusCode:'+res.statusCode));
-            var body = [];
-            res.on('data',(chunk)=> {body.push(chunk)})
-            res.on('end', ()=>{
-                try{
-                    JSON.parse(Buffer.concat(body).toString())
-                }catch(e){
-                    reject(e);
-                }
-                resolve(body);
-            })
-        });
-        req.on('error', function(err) {
-            reject(err);
-        });
-    });
-}
+
 
 dogs.get('/', function(req,res){
     var dbQuery, apiQuery;
     if(req.query.name){
         apiQuery= getPromise(`https://api.thedogapi.com/v1/breeds/search?q=${req.query.name}`);
-        console.log(apiQuery)
         dbQuery= Dog.findAll({
             where:{
                 name:{
@@ -54,13 +35,13 @@ dogs.get('/', function(req,res){
     apiQuery.then(data=> data.map(dog=> (   {name:dog.name, temperaments:dog.temperament, weight:dog.weight.metric, img:dog.image.url}  )))
 
     Promise.all([dbQuery,apiQuery])
-    .then(  (data)=>res.send( {dbData:data[0], apiData:data[0]}    ) )
+    .then(  (data)=>res.send( {dbData:data[0], apiData:data[1]}    ) )
 
 })
 
 dogs.get('/:id', function(req,res){
     var result;
-    if(req.params.id[0] === 'd'){
+    if(typeof req.params.id === 'string' && req.params.id[0] === 'd'){
         let databaseId = parseInt(req.params.id.substring(1));
         result = Dog.findByPk(databaseId)
         .then(dog=>
@@ -76,10 +57,11 @@ dogs.get('/:id', function(req,res){
             )
         )
     }else{
+        
         result = getPromise(`https://api.thedogapi.com/v1/breeds`)
-        .then(data => data.find(elem=> elem.id===req.params.id))
+        .then(data =>  data.find(elem=> (elem.id==req.params.id)   ));
     }
-    result.then(found=> res.send(found));
+    result.then(found=> {console.log(found);res.send(found)});
 })
 
 dogs.post('/', function(req,res){
