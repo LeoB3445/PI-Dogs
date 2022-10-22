@@ -1,5 +1,4 @@
 const {Router}= require('express');
-const https = require('https');
 const { Op } = require('sequelize');
 const {Dog, Temperament} = require('../db.js');
 const {getPromise} = require('./apiCallers')
