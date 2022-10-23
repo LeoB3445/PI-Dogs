@@ -12,7 +12,7 @@ const dummy = {
   life_expectancy: 3
 }
 
-describe('dog routes', () => {
+xdescribe('dog routes', () => {
   before(() => conn.authenticate()
   .catch((err) => {
     console.error('Unable to connect to the database:', err);
